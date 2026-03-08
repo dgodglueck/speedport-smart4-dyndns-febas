@@ -1,0 +1,4 @@
+RewriteEngine On
+
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule ^nic/update$ update.php [L,QSA]
