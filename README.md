@@ -17,7 +17,7 @@ Dieses kleine PHP-Skript ist als DynDNS-Update-Client für den Router **Speedpor
 
 ## Installation
 
-1. Skript in das Dokumentenverzeichnis des Webservers kopieren (`update.php`).
+1. `update.php` und `.htaccess` in das Dokumentenverzeichnis des Webservers hochladen.
 2. Optional: Berechtigungen und Sicherheitsmaßnahmen (z. B. Zugriffs­beschränkung) konfigurieren.
 
 ## Verwendung
@@ -45,7 +45,7 @@ HTTP-Statuscodes werden entsprechend gesetzt (z. B. 401 für `badauth`).
 
 ## Lizenz
 
-Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` (falls vorhanden).
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
 
 ## Hinweise
 
