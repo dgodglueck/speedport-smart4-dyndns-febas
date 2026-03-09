@@ -16,11 +16,12 @@ class DynDnsService
         $host = (string) ($_GET["hostname"] ?? "");
 
         if (empty($auth["user"]) || empty($auth["pass"])) {
-            $this->terminate(401, "badauth");
+            http_response_code(401);
+            exit("badauth");
         }
 
         if ($host === "") {
-            $this->terminate(200, "notfqdn");
+            exit("notfqdn");
         }
 
         $ips = $this->getIPs();
@@ -41,17 +42,23 @@ class DynDnsService
 
     private function getIPs(): array
     {
-        $ip = explode(
-            ",",
-            (string) ($_GET["myip"] ?? $_SERVER["REMOTE_ADDR"])
-        )[0];
-        $ip = trim($ip);
-        $isV6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+        $raw = (string) ($_GET["myip"] ?? "");
+        $ips = explode(",", $raw);
 
-        return [
-            "v4" => $isV6 ? "" : $ip,
-            "v6" => $isV6 ? $ip : "",
-        ];
+        $v4 = "";
+        $v6 = "";
+
+        foreach ($ips as $ip) {
+            $ip = trim($ip);
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $v4 = $ip;
+            }
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $v6 = $ip;
+            }
+        }
+
+        return ["v4" => $v4, "v6" => $v6];
     }
 
     private function sendUpdate(
@@ -70,6 +77,7 @@ class DynDnsService
 
         $ch = curl_init(self::API_URL . "?{$query}");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $res = curl_exec($ch);
         curl_close($ch);
 
@@ -89,12 +97,6 @@ class DynDnsService
             str_contains($resStr, "badauth") => "badauth",
             default => "dnserr",
         };
-    }
-
-    private function terminate(int $code, string $message): never
-    {
-        http_response_code($code);
-        exit($message);
     }
 }
 
