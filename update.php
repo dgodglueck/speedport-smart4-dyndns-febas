@@ -93,7 +93,7 @@ class DynDnsService
         $resStr = strtolower(trim((string) $res));
 
         return match (true) {
-            str_contains($resStr, 'good') => 'good',
+            str_contains($resStr, 'good') || str_contains($resStr, 'nochg') => 'good',
             str_contains($resStr, 'badauth') => 'badauth',
             default => 'dnserr',
         };
