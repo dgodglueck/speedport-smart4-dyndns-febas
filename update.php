@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * DynDnsService
- * * Dieses Skript ist für PHP 8.4
+ * Dieses Skript ist für PHP 8.4
  */
 class DynDnsService
 {
