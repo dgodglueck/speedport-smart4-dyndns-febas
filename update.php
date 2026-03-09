@@ -8,20 +8,20 @@ declare(strict_types=1);
  */
 class DynDnsService
 {
-    private const API_URL = "https://www.febas.de/api/dyndns.php";
+    private const API_URL = 'https://www.febas.de/api/dyndns.php';
 
     public function run(): void
     {
         $auth = $this->getAuth();
-        $host = (string) ($_GET["hostname"] ?? "");
+        $host = (string) ($_GET['hostname'] ?? '');
 
-        if (empty($auth["user"]) || empty($auth["pass"])) {
+        if (empty($auth['user']) || empty($auth['pass'])) {
             http_response_code(401);
-            exit("badauth");
+            exit('badauth');
         }
 
-        if ($host === "") {
-            exit("notfqdn");
+        if ($host === '') {
+            exit('notfqdn');
         }
 
         $ips = $this->getIPs();
@@ -33,20 +33,20 @@ class DynDnsService
     private function getAuth(): array
     {
         return [
-            "user" =>
-                (string) ($_SERVER["PHP_AUTH_USER"] ?? ($_GET["user"] ?? "")),
-            "pass" =>
-                (string) ($_SERVER["PHP_AUTH_PW"] ?? ($_GET["pass"] ?? "")),
+            'user' =>
+                (string) ($_SERVER['PHP_AUTH_USER'] ?? ($_GET['user'] ?? '')),
+            'pass' =>
+                (string) ($_SERVER['PHP_AUTH_PW'] ?? ($_GET['pass'] ?? '')),
         ];
     }
 
     private function getIPs(): array
     {
-        $raw = (string) ($_GET["myip"] ?? "");
-        $ips = explode(",", $raw);
+        $raw = (string) ($_GET['myip'] ?? '');
+        $ips = explode(',', $raw);
 
-        $v4 = "";
-        $v6 = "";
+        $v4 = '';
+        $v6 = '';
 
         foreach ($ips as $ip) {
             $ip = trim($ip);
@@ -58,7 +58,7 @@ class DynDnsService
             }
         }
 
-        return ["v4" => $v4, "v6" => $v6];
+        return ['v4' => $v4, 'v6' => $v6];
     }
 
     private function sendUpdate(
@@ -67,12 +67,12 @@ class DynDnsService
         array $ips
     ): string|bool {
         $query = http_build_query([
-            "kundenid" => $auth["user"],
-            "token" => $auth["pass"],
-            "type" => "dyndns",
-            "domain" => $host,
-            "myip" => $ips["v4"],
-            "myip6" => $ips["v6"],
+            'kundenid' => $auth['user'],
+            'token' => $auth['pass'],
+            'type' => 'dyndns',
+            'domain' => $host,
+            'myip' => $ips['v4'],
+            'myip6' => $ips['v6'],
         ]);
 
         $ch = curl_init(self::API_URL . "?{$query}");
@@ -87,15 +87,15 @@ class DynDnsService
     private function parseResponse(mixed $res): string
     {
         if ($res === false) {
-            return "dnserr";
+            return 'dnserr';
         }
 
         $resStr = strtolower(trim((string) $res));
 
         return match (true) {
-            str_contains($resStr, "good") => "good",
-            str_contains($resStr, "badauth") => "badauth",
-            default => "dnserr",
+            str_contains($resStr, 'good') => 'good',
+            str_contains($resStr, 'badauth') => 'badauth',
+            default => 'dnserr',
         };
     }
 }
